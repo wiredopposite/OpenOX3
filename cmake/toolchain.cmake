@@ -41,8 +41,8 @@ set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES
 
 set(CMAKE_C_FLAGS_INIT "\
     --target=${CMAKE_C_COMPILER_TARGET} \
-    -isystem ${_clang_resource_dir}/include \
-    -isystem ${CMAKE_CURRENT_LIST_DIR}/../libs/libc/install/include \
+    \"-isystem${_clang_resource_dir}/include\" \
+    \"-isystem${CMAKE_CURRENT_LIST_DIR}/../libs/libc/install/include\" \
     -U_WIN32 \
     -D_PDCLIB_STATIC_DEFINE \
     -D__STDC_NO_THREADS__ \
@@ -79,6 +79,19 @@ set(CMAKE_EXE_LINKER_FLAGS_INIT "\
 # /OPT:ICF \
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+# CMAKE_SYSTEM_NAME=Generic means CMake never loads Platform/Windows-MSVC,
+# which is what normally knows to insert "/link" before MSVC-only linker
+# flags when clang-cl is the link driver. Without it, raw flags like
+# /SUBSYSTEM:NATIVE get passed to clang-cl itself, which doesn't understand
+# them. Rebuild the link rule so "/link" appears after -o/objects/libraries
+# (which clang-cl needs to parse itself) and before the MSVC-only flags.
+set(CMAKE_C_LINK_EXECUTABLE
+    "<CMAKE_C_COMPILER> <FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES> /link <CMAKE_C_LINK_FLAGS> <LINK_FLAGS>"
+)
+set(CMAKE_CXX_LINK_EXECUTABLE
+    "<CMAKE_CXX_COMPILER> <FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES> /link <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS>"
+)
 
 set(CMAKE_C_STANDARD   99)
 set(CMAKE_CXX_STANDARD 17)

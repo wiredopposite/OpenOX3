@@ -37,7 +37,7 @@ ExternalProject_Add(libcxx_build
         -DLIBCXX_INCLUDE_BENCHMARKS=OFF
         -DLIBCXX_INCLUDE_DOCS=OFF
     BUILD_COMMAND       ${CMAKE_COMMAND} --build "${_build_dir}" --parallel 6
-    BUILD_BYPRODUCTS    "${_install_dir}/lib/c++.lib"
+    BUILD_BYPRODUCTS    "${_install_dir}/lib/libc++.a"
     INSTALL_DIR         "${_install_dir}"
     USES_TERMINAL_CONFIGURE TRUE
     USES_TERMINAL_BUILD     TRUE
@@ -50,6 +50,6 @@ add_library(libcxx STATIC IMPORTED GLOBAL)
 add_dependencies(libcxx libcxx_build)
 
 set_target_properties(libcxx PROPERTIES
-    IMPORTED_LOCATION             "${_install_dir}/lib/c++.lib"
+    IMPORTED_LOCATION             "${_install_dir}/lib/libc++.a"
     INTERFACE_INCLUDE_DIRECTORIES "${_install_dir}/include/c++/v1"
 )
