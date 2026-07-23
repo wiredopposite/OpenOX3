@@ -4,3 +4,6 @@
 [submodule "thirdparty/mlibc"]
 	path = thirdparty/mlibc
 	url = https://github.com/wiredopposite/mlibc.git
+[submodule "thirdparty/newlib"]
+	path = thirdparty/newlib
+	url = git://sourceware.org/git/newlib-cygwin.git

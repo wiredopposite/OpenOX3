@@ -9,6 +9,7 @@ set(CMAKE_C_COMPILER        "${_clang_cl}"  CACHE FILEPATH "C compiler"     FORC
 set(CMAKE_CXX_COMPILER      "${_clang_cl}"  CACHE FILEPATH "C++ compiler"   FORCE)
 set(CMAKE_ASM_COMPILER      "${_clang}"     CACHE FILEPATH "ASM compiler"   FORCE)
 set(CMAKE_NASM_COMPILER     "${_nasm}"      CACHE FILEPATH "NASM compiler"  FORCE)
+set(CMAKE_ASM_NASM_COMPILER "${_nasm}"      CACHE FILEPATH "NASM compiler"  FORCE)
 set(CMAKE_MASM_COMPILER     "${_llvm_ml}"   CACHE FILEPATH "MASM compiler"  FORCE)
 set(CMAKE_LINKER            "${_lld_link}"  CACHE FILEPATH "Linker"         FORCE)
 set(CMAKE_AR                "${_llvm_ar}"   CACHE FILEPATH "Archiver"       FORCE)
@@ -31,9 +32,10 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-set(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES   
+set(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES
     "${_clang_resource_dir}/include"
-    "${CMAKE_CURRENT_LIST_DIR}/../libs/libc/install/include" 
+    "${CMAKE_CURRENT_LIST_DIR}/../libs/libc/port/include"
+    "${CMAKE_CURRENT_LIST_DIR}/../thirdparty/newlib/newlib/libc/include"
 )
 set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES 
     "${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}"
@@ -42,14 +44,23 @@ set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES
 set(CMAKE_C_FLAGS_INIT "\
     --target=${CMAKE_C_COMPILER_TARGET} \
     \"-isystem${_clang_resource_dir}/include\" \
-    \"-isystem${CMAKE_CURRENT_LIST_DIR}/../libs/libc/install/include\" \
+    \"-isystem${CMAKE_CURRENT_LIST_DIR}/../libs/libc/port/include\" \
+    \"-isystem${CMAKE_CURRENT_LIST_DIR}/../thirdparty/newlib/newlib/libc/include\" \
     -U_WIN32 \
     -D_PDCLIB_STATIC_DEFINE \
     -D__STDC_NO_THREADS__ \
     -D_HAS_EXCEPTIONS=0 \
+    -D__GNUC__=4 \
+    -D__GNUC_MINOR__=2 \
+    -D__GNUC_PATCHLEVEL__=1 \
+    -D_LDBL_EQ_DBL \
+    -DHAVE_MMAP=0 \
+    -D__USER_LABEL_PREFIX__=_ \
+    -D__STDC__=1 \
     -ffreestanding \
     -fno-exceptions \
     -fno-rtti \
+    -GS- \
     -nostdinc \
     -nostdinc++ \
     -nobuiltininc \
@@ -95,3 +106,5 @@ set(CMAKE_CXX_LINK_EXECUTABLE
 
 set(CMAKE_C_STANDARD   99)
 set(CMAKE_CXX_STANDARD 17)
+
+set(CMAKE_ASM_NASM_OBJECT_FORMAT win32)
